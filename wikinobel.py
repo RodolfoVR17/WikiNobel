@@ -22,6 +22,33 @@ url2 = "https://en.wikipedia.org/wiki/List_of_Nobel_laureates_by_country"
 df = pd.DataFrame(scrape_data(url), columns=['year', 'physics', 'chemistry', 'medicine', 'literature', 'peace', 'economics'])
 
 df.to_csv("nobel.csv", index=False)
+# Load the data with specified encoding
+df = pd.read_csv('nobel.csv', encoding='ISO-8859-1')
+
+
+# Remove any leading/trailing whitespace
+df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+# Handle missing values (this will depend on your specific data)
+df = df.dropna()  # This line removes any rows with missing values
+
+# Convert data to appropriate types
+df['year'] = pd.to_datetime(df['year'], format='%Y', errors='coerce')
+
+
+
+def convert_encoding(element):
+    if isinstance(element, str):
+        return element.encode('ISO-8859-1').decode('UTF-8')
+    else:
+        return element
+
+df = df.applymap(convert_encoding)
+
+print(df)
+
+print(df.head())
+
 def scrape_data2(url):
     response = requests.get(url)
 
@@ -30,7 +57,7 @@ def scrape_data2(url):
     # Find the specific section by its heading
     li = soup.find_all('ol')
 
-    print(li)
+    #print(li)
 
     for h2 in li:
         if h2.span and 'Country (or territory) of birth' in h2.span.text:
