@@ -21,7 +21,6 @@ url2 = "https://en.wikipedia.org/wiki/List_of_Nobel_laureates_by_country"
 
 df = pd.DataFrame(scrape_data(url), columns=['year', 'physics', 'chemistry', 'medicine', 'literature', 'peace', 'economics'])
 
-df.to_csv("nobel.csv", index=False)
 # Load the data with specified encoding
 df = pd.read_csv('nobel.csv', encoding='ISO-8859-1')
 
@@ -44,27 +43,32 @@ def convert_encoding(element):
         return element
 
 df = df.applymap(convert_encoding)
-
+df = df.dropna(how='any')
 print(df)
 
 print(df.head())
+df = pd.read_csv('nobel.csv').dropna(how='all')
+df = df.fillna('No award')
+
+
+df.to_csv("nobel.csv", index=False)
 
 def scrape_data2(url):
     response = requests.get(url)
-
     soup = BeautifulSoup(response.text, 'html.parser')
-    
+
     # Find the specific section by its heading
-    li = soup.find_all('ol')
-
-    #print(li)
-
-    for h2 in li:
+    h2s = soup.find_all('h2')
+    for h2 in h2s:
         if h2.span and 'Country (or territory) of birth' in h2.span.text:
             break
+    print("This is H2")
+    print(h2)  # Check the content of h2
 
     # Get the next sibling element that is a 'div'
     div = h2.find_next_sibling('div')
+    print("This is DIV")
+    print(div)  # Check the content of div
 
     data = []
     for country in div.find_all('h3'):
@@ -75,5 +79,14 @@ def scrape_data2(url):
 
     return data
 
-print(scrape_data2(url2))
+#print(scrape_data2(url2))
+
+def look_year_category(year, category):
+    df_year = df[(df['year'] == year)]
+    word_list = df_year[category].tolist()
+    word_list = (word_list[0].split(';'))
+    return word_list
+
+print(look_year_category(1903, 'economics'))
+
 
