@@ -52,7 +52,6 @@ def clean_dataframe(df):
 
 url = 'https://en.wikipedia.org/wiki/List_of_Nobel_laureates'
 
-url2 = "https://en.wikipedia.org/wiki/List_of_Nobel_laureates_by_country"
 
 df = pd.DataFrame(scrape_data(url), columns=['year', 'physics', 'chemistry', 'medicine', 'literature', 'peace', 'economics'])
 
@@ -110,9 +109,27 @@ try:
     page = wikipedia.page("List of Nobel laureates by country")
     content = page.content
     print("Title: " + page.title)
-    print(content)
+    contentList = content.split("===")
+    print(contentList)
+
+
+    your_string = "This is the string you want to save as a text file."
+
+    # Specify the filename
+    filename = "country.txt"
+
+    
+
+    # Writing the string to the text file
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(content)
+
+    print(f"Content saved to {filename}")
+
 except wikipedia.exceptions.PageError:
     print("Page not found")
 except wikipedia.exceptions.DisambiguationError as e:
     print("Disambiguation error. Possible options include:")
     print(e.options)
+
+
